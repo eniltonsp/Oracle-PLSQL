@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE "PRC_EMAIL_SEND" (host_destiny varchar2,
+CREATE OR REPLACE PROCEDURE "PRC_SEND_EMAIL" (host_destiny varchar2,
                                  msg_from_email varchar2,
                                  msg_from_name varchar2,
                                  msg_to_email varchar2,
