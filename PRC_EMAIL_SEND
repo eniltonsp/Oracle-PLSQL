@@ -1,0 +1,94 @@
+CREATE OR REPLACE PROCEDURE "PRC_EMAIL_SEND" (host_destiny varchar2,
+                                 msg_from_email varchar2,
+                                 msg_from_name varchar2,
+                                 msg_to_email varchar2,
+                                 msg_to_name varchar2,
+                                 msg_cc_email varchar2,
+                                 msg_cc_name varchar2,
+                                 msg_subject varchar2,
+                                 msg_text varchar2,
+                                 system varchar2)  IS
+
+  c utl_tcp.connection;
+  W_HOST VARCHAR2(30) ;
+  w_system varchar2(1000):= system ;
+  rc integer;
+BEGIN
+BEGIN
+  W_HOST := 'NAME_HOST';
+  --host_destiny := W_HOST;
+  --c := utl_tcp.open_connection(host_destiny,25);   --open the SMTP
+  c := utl_tcp.open_connection('NAME_HOST',25);      --open the SMTP
+  --PORT
+  dbms_output.put_line(utl_tcp.get_line(c,TRUE));
+  rc := utl_tcp.write_line(c, 'HELO localhost');
+  dbms_output.put_line(utl_tcp.get_line(c, TRUE));
+  rc := utl_tcp.write_line(c, 'MAIL FROM: <'||msg_from_email||'>');
+  dbms_output.put_line(utl_tcp.get_line(c, TRUE));
+  rc := utl_tcp.write_line(c, 'RCPT TO: <'||msg_to_email||'>');
+  dbms_output.put_line(utl_tcp.get_line(c, TRUE));
+
+  rc := utl_tcp.write_line(c, 'DATA');              --Start message body
+  dbms_output.put_line(utl_tcp.get_line(c, TRUE));
+  rc := utl_tcp.write_line(c, 'FROM: '||msg_from_name||' <'||msg_from_email||'>');
+  rc := utl_tcp.write_line(c, 'TO: '||msg_to_name||' <'||msg_to_email||'>');
+  rc := utl_tcp.write_line(c, 'CC: '||msg_cc_name||' <'||msg_cc_email||'>');
+  rc := utl_tcp.write_line(c, 'Subject: '||msg_subject);
+  rc := utl_tcp.write_line(c, 'Content-Type: text/html; charset="ISO-8859-1"');
+  rc := utl_tcp.write_line(c, '');
+
+  rc := utl_tcp.write_line(c, '<html>');
+  rc := utl_tcp.write_line(c, '<body bgcolor="#f6f6f6">');
+  rc := utl_tcp.write_line(c, '<table border="0" ALIGN="CENTER">');
+  rc := utl_tcp.write_line(c, '<tr>');
+  rc := utl_tcp.write_line(c, '<td>');
+  rc := utl_tcp.write_line(c, '<table border="1" width="700" height="400">');
+  rc := utl_tcp.write_line(c, '<tr>');
+  rc := utl_tcp.write_line(c, '<td height="25" bgcolor="#008B54">');
+  rc := utl_tcp.write_line(c, '<table border="0" cellpadding="0" cellspacing="0" bgcolor="#008B54">');
+  rc := utl_tcp.write_line(c, '<tr>');
+  rc := utl_tcp.write_line(c, '<td bgcolor="#008B54" align="left" width="90"><img src="\\unimed04\sisuas$\v6i\logo.jpg" border="0"></td>');
+  rc := utl_tcp.write_line(c, '<td bgcolor="#008B54" align="center" width="610"><font align="top" face="Verdana" size="2" color="#ffffff"><b>Personal Message</b></font></td>');
+  rc := utl_tcp.write_line(c, '</tr>');
+  rc := utl_tcp.write_line(c, '</table>');
+  rc := utl_tcp.write_line(c, '</td>');
+  rc := utl_tcp.write_line(c, '</tr>');
+  rc := utl_tcp.write_line(c, '<tr>');
+  rc := utl_tcp.write_line(c, '<td bgcolor="#ffffff" valign="top">');
+  rc := utl_tcp.write_line(c, '<table border="0">');
+  rc := utl_tcp.write_line(c, '<tr>');
+  rc := utl_tcp.write_line(c, '<td width="10">;</td>');
+  rc := utl_tcp.write_line(c, '<td>');
+  rc := utl_tcp.write_line(c, msg_text);
+  rc := utl_tcp.write_line(c, '</tr>');
+  rc := utl_tcp.write_line(c, '</table>');
+  rc := utl_tcp.write_line(c, '</td>');
+  rc := utl_tcp.write_line(c, '</tr>');
+  rc := utl_tcp.write_line(c, '<tr>');
+  rc := utl_tcp.write_line(c, '<td width="10">');
+  rc := utl_tcp.write_line(c, '</td>');
+  rc := utl_tcp.write_line(c, '</tr>');
+  rc := utl_tcp.write_line(c, '<tr>');
+  rc := utl_tcp.write_line(c, '<td align="center"><font face="Verdana" size="2"><b><a href="//* HTTP://SERVER *// ">View Internal Network Request </a></b></font></td>');
+  rc := utl_tcp.write_line(c, '</tr>');
+  rc := utl_tcp.write_line(c, '<tr>');
+  rc := utl_tcp.write_line(c, '<td width="100%" height="20" bgcolor="#008B54">');
+  rc := utl_tcp.write_line(c, '</td>');
+  rc := utl_tcp.write_line(c, '</tr>');
+  rc := utl_tcp.write_line(c, '</table>');
+  rc := utl_tcp.write_line(c, '</td>');
+  rc := utl_tcp.write_line(c, '</tr>');
+  rc := utl_tcp.write_line(c, '</table>');
+  rc := utl_tcp.write_line(c, '</body>');
+  rc := utl_tcp.write_line(c, '</html>');
+   rc := utl_tcp.write_line(c, '.');                 --End of message body
+  dbms_output.put_line(utl_tcp.get_line(c, TRUE));
+  rc := utl_tcp.write_line(c, 'QUIT');
+  dbms_output.put_line(utl_tcp.get_line(c, TRUE));
+  utl_tcp.close_connection(c);                    
+
+ END;
+
+END;
+/
+
