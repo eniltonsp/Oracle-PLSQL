@@ -1,0 +1,11 @@
+create or replace function rotate_cod_proc(v_nr_autorization varchar2)
+  return varchar2 as
+  v_part_name varchar2(2000) := '';
+begin
+  select listagg(COD_PROC, ' + ') within group(order by 1)
+    into v_part_name
+    from (select distinct COD_PROC
+            from TABLE_NAME
+           WHERE nr_autorizacao = v_nr_autorization);
+  return v_part_name;
+end;
