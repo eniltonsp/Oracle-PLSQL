@@ -1,0 +1,19 @@
+create or replace function rotate_descr_proc(v_nr_autorizacao varchar2)
+  return varchar2 as
+  v_part_name varchar2(2000) := '';
+begin
+  for c1 in (select DESCRICAO_PROCEDIMENTO
+               from AGR_INTERNACAO_AT
+              where nr_autorizacao = v_nr_autorizacao
+                and ind_cirurgico = 'S'
+              group by DESCRICAO_PROCEDIMENTO
+              order by DESCRICAO_PROCEDIMENTO asc) loop
+    if (v_part_name IS NULL) then
+      v_part_name := c1.DESCRICAO_PROCEDIMENTO;
+    else
+      v_part_name := v_part_name || '  +  ' || c1.DESCRICAO_PROCEDIMENTO;
+    end if;
+  end loop;
+  return v_part_name;
+end;
+/
