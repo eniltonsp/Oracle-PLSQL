@@ -1,0 +1,53 @@
+
+CREATE GLOBAL TEMPORARY TABLE MYTEMPTABLE_MAX_VAL_PREST (
+        NUM_AUTORIZATION              VARCHAR2(30),   
+        VAL_COST_MAX                NUMBER
+      )
+      ON COMMIT PRESERVE ROWS;
+  
+DROP TABLE MYTEMPTABLE_PREST;
+CREATE GLOBAL TEMPORARY TABLE MYTEMPTABLE_PREST (
+        NUM_AUTORIZATION              VARCHAR2(30),   
+        COD_PROVIDER              VARCHAR2(50),           
+        NAME_PROVIDER             VARCHAR2(100),
+        VAL_COST_MAX              NUMBER
+      )
+      ON COMMIT PRESERVE ROWS;
+
+
+ INSERT INTO MYTEMPTABLE_MAX_VAL_PREST ( 
+                            SELECT NUM_AUTORIZATION,
+                                   MAX(VAL_COST)VAL_CUSTO_MAX
+
+                              FROM (SELECT T.NUM_AUTORIZATION, 
+                                           T.COD_PROVIDER,
+                                           T.NAME_PROVIDER,
+                                           SUM(T.VAL_COST) VAL_COST
+                                      FROM AGR_TABLE_NAME_DW T
+                                     GROUP BY T.COD_PROVIDER, T.NAME_PROVIDER, T.NUM_AUTORIZATION)D
+                                     GROUP BY D.NUM_AUTORIZATION 
+                                      ) ;
+                                     COMMIT;  
+
+INSERT INTO MYTEMPTABLE_PREST (
+               
+        SELECT NUM_AUTORIZATION,
+                       NUM_PROVIDER,
+                       NAME_PROVIDER,
+                       VAL_COST VAL_CUSTO_MAX
+                  FROM (SELECT T3.NUM_AUTORIZATION,
+                               T3.NUM_PROVIDER,
+                               T3.NAME_PROVIDER,
+                               SUM(T3.VAL_COST) VAL_COST
+                        
+                          FROM AGR_TABLE_NAME_DW T3
+                         GROUP BY T3.NUM_AUTORIZATION,
+                                  T3.NUM_PROVIDER,
+                                  T3.NAME_PROVIDER) D
+                 WHERE D.VAL_COST = (SELECT PT.VAL_CUSTO_MAX
+                                               FROM MYTEMPTABLE_MAX_VAL_PREST PT 
+                                               WHERE NUM_AUTORIZATION = '128655951' PT.NUM_AUTORIZATION = D.NUM_AUTORIZATION
+                                               )
+                                       
+                                       );
+                                 COMMIT;
