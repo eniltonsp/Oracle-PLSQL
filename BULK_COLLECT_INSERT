@@ -1,4 +1,15 @@
 
+SET DEFINE OFF 
+
+BEGIN
+
+	DBMS_ERRLOG.create_error_log (dml_table_name => 'AGR_TABLE_NAME_DW');
+	
+END;
+/
+exit;
+
+
 CREATE OR REPLACE PROCEDURE PRC_AGR_TABLE_DW(P_DATE_INI DATE)
 
 IS
