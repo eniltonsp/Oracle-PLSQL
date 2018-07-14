@@ -1,0 +1,50 @@
+
+DECLARE 
+  
+   V_COMPET_INI   DATE;
+   V_COMPET_FIM   DATE;
+   V_COMPET_AUX   DATE;
+
+   V_MES    VARCHAR2(2):=NULL;
+   V_ANO    VARCHAR2(4):=NULL;
+   
+BEGIN 
+
+      V_COMPET_INI := TO_DATE('&P_DT_BASE', 'DD/MM/RRRR');
+      V_COMPET_FIM := TO_DATE('&P_DT_BASE_F' , 'DD/MM/RRRR');
+
+      V_COMPET_AUX := V_COMPET_INI;
+
+      WHILE V_COMPET_AUX <= V_COMPET_FIM
+      LOOP
+      V_MES := TO_CHAR(V_COMPET_AUX,'MM');
+      V_ANO := TO_CHAR(V_COMPET_AUX,'YYYY');
+
+   
+ 
+    CNU_PKG_BI_UTIL.CNU_SP_BI_LOG_CARGA('I',
+                                        'prc_aplica_tipo_mat_med',
+                                        'V_COMPET_AUX',
+                                        V_MES,
+                                        V_ANO,
+                                        SYSDATE,
+                                        NULL);
+      prc_aplica_tipo_mat_med(V_COMPET_AUX);
+
+    -- FINAL DA CARGA
+    CNU_PKG_BI_UTIL.CNU_SP_BI_LOG_CARGA('U',
+                                        'prc_aplica_tipo_mat_med',
+                                        'V_COMPET_AUX',
+                                        V_MES,
+                                        V_ANO,
+                                        NULL,
+                                        SYSDATE);
+
+      
+      V_COMPET_AUX := ADD_MONTHS(V_COMPET_AUX, 1);    
+      -- FINAL DA CARGA
+
+      END LOOP;
+      END;      
+      
+
