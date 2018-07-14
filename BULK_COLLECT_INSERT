@@ -1,0 +1,60 @@
+
+CREATE OR REPLACE PROCEDURE PRC_AGR_TABLE_DW(P_DATE_INI DATE)
+
+IS
+
+    TYPE T_ESPE IS TABLE OF AGR_TABLE_NAME_DW%ROWTYPE INDEX BY PLS_INTEGER;
+
+    ESPE T_ESPE;
+
+    -- CURSOR SECTION --------------------------------------------------
+    CURSOR C_ESPE IS
+
+    SELECT F.FIELD1,
+           F.FIELD2,
+           F.FIELD3,
+           F.FIELD4,
+           F.FIELD5,
+           F.FIELD6,
+           F.MONTH_DATE
+    FROM FACT_TABLE_DW F
+    WHERE F.FIELD1 IN ('71', '555')
+    AND F.MONTH_DATE >= P_DATA_INI
+    GROUP BY F.FIELD1,
+           F.FIELD2,
+           F.FIELD3,
+           F.FIELD4,
+           F.FIELD5,
+           F.FIELD6,
+           F.MONTH_DATE;
+
+    --
+    BEGIN
+
+      -- DELETE SECTION ------------------------------------------------
+      DELETE FROM AGR_NAME_TABLE_DW WHERE MONTH_DATE = P_DATA_INI;
+      COMMIT;
+
+      --
+      OPEN C_ESPE;
+      LOOP
+        FETCH C_ESPE BULK COLLECT
+          INTO ESPE LIMIT 10000;
+        EXIT WHEN ESPE.COUNT = 0;
+
+        --
+        FORALL I IN 1 .. ESPE.COUNT
+          -- INSERT SECTION ---------------------------------------------
+          INSERT INTO AGR_TABLE_NAME_DW
+          VALUES ESPE
+            (I) LOG ERRORS REJECT LIMIT UNLIMITED;
+
+      END LOOP;
+
+      CLOSE C_ESPE;
+
+      --
+      COMMIT;
+
+END PRC_AGR_TABLE_DW;
+
